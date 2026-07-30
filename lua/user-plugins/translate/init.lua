@@ -12,7 +12,7 @@ local CONFIG = {
     llama_cpp_dir = vim.fn.expand("~/llama.cpp/build"),
     port = 9999,
     host = "127.0.0.1",
-    model = vim.fn.expand("~/models/") .. "Hy-MT2-1.8B-Q4_K_M.gguf",
+    model = vim.fn.expand("~/models/Hy-MT2-1.8B-Q4_K_M.gguf"),
 }
 
 local api_url = string.format("http://%s:%d/v1/chat/completions", CONFIG.host, CONFIG.port)
@@ -151,28 +151,32 @@ function M.split(from_visual)
         return vim.notify("Invalid language. Use en or zh.", vim.log.levels.WARN)
     end
 
+    local source_ft = vim.bo.filetype
+
     ensure_server(function()
         translate(text, target, function(result)
-            if not result then
-                vim.notify("✗ Translation failed", vim.log.levels.ERROR)
-                return
-            end
+            vim.schedule(function()
+                if not result then
+                    vim.notify("✗ Translation failed", vim.log.levels.ERROR)
+                    return
+                end
 
-            -- 创建侧栏 scratch buffer
-            vim.cmd("vsplit")
-            vim.cmd("enew")
-            local buf = vim.api.nvim_get_current_buf()
-            vim.api.nvim_buf_set_name(buf, "Translation")
-            vim.bo[buf].buftype = "nofile"
-            vim.bo[buf].bufhidden = "wipe"
-            vim.bo[buf].modified = false
+                vim.cmd("vsplit")
+                vim.cmd("enew")
+                local buf = vim.api.nvim_get_current_buf()
+                vim.api.nvim_buf_set_name(buf, "Translation")
+                vim.bo[buf].buftype = "nofile"
+                vim.bo[buf].bufhidden = "wipe"
+                vim.bo[buf].filetype = source_ft
+                vim.bo[buf].modified = false
 
-            local lines = vim.split(result, "\n", { plain = true })
-            if lines[#lines] == "" then table.remove(lines) end
-            vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-            vim.bo[buf].modified = false
+                local lines = vim.split(result, "\n", { plain = true })
+                if lines[#lines] == "" then table.remove(lines) end
+                vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+                vim.bo[buf].modified = false
 
-            vim.notify("✓ Translated (" .. target .. ")", vim.log.levels.INFO)
+                vim.notify("✓ Translated (" .. target .. ")", vim.log.levels.INFO)
+            end)
         end)
     end)
 end
@@ -197,25 +201,27 @@ function M.replace(from_visual)
 
     ensure_server(function()
         translate(text, target, function(result)
-            if not result then
-                vim.notify("✗ Translation failed", vim.log.levels.ERROR)
-                return
-            end
+            vim.schedule(function()
+                if not result then
+                    vim.notify("✗ Translation failed", vim.log.levels.ERROR)
+                    return
+                end
 
-            local lines = vim.split(result, "\n", { plain = true })
-            if lines[#lines] == "" then table.remove(lines) end
+                local lines = vim.split(result, "\n", { plain = true })
+                if lines[#lines] == "" then table.remove(lines) end
 
-            if from_visual then
-                local sr = vim.fn.line("'<")
-                local er = vim.fn.line("'>")
-                if sr > er then sr, er = er, sr end
-                vim.api.nvim_buf_set_lines(buf, sr - 1, er, false, lines)
-            else
-                vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-            end
-            vim.bo[buf].modified = true
+                if from_visual then
+                    local sr = vim.fn.line("'<")
+                    local er = vim.fn.line("'>")
+                    if sr > er then sr, er = er, sr end
+                    vim.api.nvim_buf_set_lines(buf, sr - 1, er, false, lines)
+                else
+                    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+                end
+                vim.bo[buf].modified = true
 
-            vim.notify("✓ Translated " .. #lines .. " lines (" .. target .. ")", vim.log.levels.INFO)
+                vim.notify("✓ Translated " .. #lines .. " lines (" .. target .. ")", vim.log.levels.INFO)
+            end)
         end)
     end)
 end
