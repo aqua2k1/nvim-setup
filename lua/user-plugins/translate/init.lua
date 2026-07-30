@@ -13,6 +13,7 @@ local CONFIG = {
     port = 9999,
     host = "127.0.0.1",
     model = vim.fn.expand("~/models/Hy-MT2-1.8B-Q4_K_M.gguf"),
+    context = 8192,  -- 上下文长度（token），翻译够用且省显存
     idle_seconds = 600,  -- 闲置后自动卸载模型，下次请求自动重新加载
 }
 
@@ -81,6 +82,8 @@ local function start_server(cb)
         bin,
         "-m", CONFIG.model,
         "-ngl", "99",
+        "-c", tostring(CONFIG.context),
+        "-np", "1",
         "--port", tostring(CONFIG.port),
         "--host", CONFIG.host,
         "--sleep-idle-seconds", tostring(CONFIG.idle_seconds),
