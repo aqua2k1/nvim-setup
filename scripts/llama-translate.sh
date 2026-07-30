@@ -5,6 +5,7 @@ set -euo pipefail
 
 LLAMA_DIR="$HOME/llama.cpp"
 BUILD_DIR="$LLAMA_DIR/build"
+# https://huggingface.co/tencent/Hy-MT2-1.8B-GGUF/resolve/main/Hy-MT2-1.8B-Q4_K_M.gguf?download=true
 MODEL="tencent/Hy-MT2-1.8B-GGUF:Q4_K_M"
 
 echo "=== Cloning/updating llama.cpp ==="
