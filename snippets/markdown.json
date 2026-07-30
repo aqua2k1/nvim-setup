@@ -1,0 +1,11 @@
+{
+    "code fence": {
+        "prefix": "```",
+        "body": [
+            "```${1}",
+            "$0",
+            "```"
+        ],
+        "description": "Markdown code fence"
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "name": "personal-snippets",
+    "contributes": {
+        "snippets": [
+            { "language": "json", "path": "./tasks.json" },
+            { "language": "markdown", "path": "./markdown.json" }
+        ]
+    }
+}
