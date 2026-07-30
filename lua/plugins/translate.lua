@@ -1,7 +1,6 @@
 return {
     dir = vim.fn.stdpath("config") .. "/lua/user-plugins/translate",
     name = "translate",
-    cmd = "CloseTranslateLLama",
     lazy = true,
     keys = {
         { "<leader>at", function() require("user-plugins.translate").split(false) end, mode = "n", desc = "翻译全文到侧栏" },
