@@ -1,3 +1,5 @@
+--- `Snacks` 全局由插件在运行时注入，lua-language-server 静态分析无法识别
+---@diagnostic disable: undefined-global
 local M = {
     "folke/snacks.nvim",
     priority = 1000,
@@ -59,6 +61,8 @@ local M = {
 
                 -- Override print to use snacks for `:=` command
                 if vim.fn.has("nvim-0.11") == 1 then
+                    --- vim._print 在 nvim 的类型定义中已存在，此覆盖是官方推荐做法
+                    ---@diagnostic disable-next-line: duplicate-set-field
                     vim._print = function(_, ...)
                         dd(...)
                     end

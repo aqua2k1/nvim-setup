@@ -1,5 +1,4 @@
 local map = vim.keymap.set
-local unmap = vim.keymap.del
 
 local M = {
     'akinsho/toggleterm.nvim',
@@ -26,7 +25,6 @@ local M = {
             map('t', '<C-w>l', [[<Cmd>wincmd l<CR>]], opts)
             map('t', '<C-j>', [[<down>]], opts)
             map('t', '<C-k>', [[<up>]], opts)
-            map('n', 'q', [[<cmd>close<cr>]], opts)
             map('n', 'q', function()
                 vim.cmd('TermExec cmd=""')
                 vim.cmd('TermExec cmd="exit"')
@@ -102,10 +100,12 @@ function M.input_command()
     }
 
     vim.ui.input({ prompt = 'Enter Command: ' }, function(input)
+        if not input then
+            return
+        end
         opts.cmd = input
+        toggle(opts)
     end)
-
-    return opts
 end
 
 M.keys = {
@@ -113,7 +113,7 @@ M.keys = {
     { "<leader>ts", function() toggle(M.split_term()) end,    desc = "split" },
     { "<leader>tf", function() toggle(M.float_term()) end,    desc = "float" },
     { "<leader>tt", function() toggle(M.tab_term()) end,      desc = "tab" },
-    { "<leader>tc", function() toggle(M.input_command()) end, desc = "Input Command" },
+    { "<leader>tc", function() M.input_command() end, desc = "Input Command" },
 }
 
 

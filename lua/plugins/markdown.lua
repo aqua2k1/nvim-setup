@@ -5,7 +5,7 @@ local M = {
         'nvim-mini/mini.icons'
     },
     opts = {
-        render_modes = { 'i', 'n', 'c', 't' } 
+        render_modes = { 'i', 'n', 'c', 't' }
     },
     ft = { "markdown", "norg", "rmd", "org", "codecompanion" },
     config = function(_, opts)
