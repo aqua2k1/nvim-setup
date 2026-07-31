@@ -1,0 +1,7 @@
+{
+  "runtime.version": "LuaJIT",
+  "workspace.library": [
+    "$VIMRUNTIME/lua",
+    "$HOME/.local/share/nvim/lazy/lazy.nvim/lua"
+  ]
+}
