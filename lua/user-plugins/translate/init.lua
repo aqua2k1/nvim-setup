@@ -9,7 +9,6 @@ local M = {}
 -- ====== 常量 ======
 
 local CONFIG = {
-    llama_cpp_dir = vim.fn.expand("~/llama.cpp/build"),
     port = 9999,
     host = "127.0.0.1",
     model = vim.fn.expand("~/models/Hy-MT2-1.8B-Q4_K_M.gguf"),
@@ -69,10 +68,10 @@ end
 
 local function start_server(cb)
 
-    local bin = CONFIG.llama_cpp_dir .. "/bin/llama-server"
-    if vim.fn.executable(bin) ~= 1 then
+    local bin = vim.fn.exepath("llama-server")
+    if bin == "" then
         vim.notify(
-            "llama-server not found at " .. bin .. "\nRun: nvim/scripts/llama-translate.sh",
+            "llama-server not found in $PATH\nInstall via package manager, or build and add to PATH (see scripts/llama-translate.sh)",
             vim.log.levels.ERROR
         )
         return
