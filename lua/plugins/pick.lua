@@ -46,6 +46,19 @@ local M = {
                 ["<C-t>"] = "ctrl-t",         -- 新标签
             },
         },
+        actions = {
+            files = {
+                [1] = true, -- 继承默认 actions（enter/ctrl-s/ctrl-v/ctrl-t/alt-q 等）
+                -- <C-a>: 接收所有结果并发送到 quickfix
+                ["ctrl-a"] = {
+                    fn = function(selected, opts)
+                        require('fzf-lua.actions').file_sel_to_qf(selected, opts)
+                    end,
+                    prefix = "select-all", -- 先让 fzf 全选所有匹配项，再 accept
+                    desc = "Select all to Quickfix",
+                },
+            },
+        },
     },
 }
 
