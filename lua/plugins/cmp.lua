@@ -43,7 +43,17 @@ local M = {
                 },
             },
             sources = {
-                default = { 'snippets', 'lsp', 'path', 'buffer' },
+                providers = {
+                    pi_agent = {
+                        module = 'user-plugins.pi-agent-completion',
+                        name = 'pi_agent',
+                        min_keyword_length = 0, -- @ / 后 0 字符也要触发
+                        -- 与内置 path source 同时命中时 (触发字符含 / 和 .),
+                        -- 让 skill/@ 结果排最前, path 结果排后面
+                        score_offset = 100,
+                    },
+                },
+                default = { 'snippets', 'lsp', 'path', 'buffer', 'pi_agent' },
             },
         },
     },
