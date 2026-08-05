@@ -19,10 +19,16 @@ vim.o.mouse = 'a'
 vim.o.linebreak = true
 
 -- Sync clipboard between the OS and Neovim.
+-- tmux: forward the clipboard via OSC 52 (also works over SSH).
 -- WSL: pin xclip so provider detection does not walk the huge Windows PATH.
 local is_wsl = vim.fn.has("wsl") == 1
   or (vim.uv.os_uname().release or ""):lower():find("microsoft", 1, true) ~= nil
-if is_wsl then
+
+vim.o.clipboard = "unnamedplus"
+
+if vim.env.TMUX then
+  vim.g.clipboard = "osc52"
+elseif is_wsl then
   vim.g.clipboard = {
     name = "xclip",
     copy = {
@@ -35,10 +41,8 @@ if is_wsl then
     },
     cache_enabled = 1,
   }
-  vim.o.clipboard = "unnamedplus"
-else
-  vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 end
+-- else: 不设 g.clipboard，走 nvim 自动检测
 
 -- Save undo history.
 vim.o.undofile = true
