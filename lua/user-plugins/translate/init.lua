@@ -12,6 +12,7 @@
 
 local M = {}
 
+local config = require("user-plugins.translate.config")
 local server = require("user-plugins.translate.server")
 local pipeline = require("user-plugins.translate.pipeline")
 
@@ -58,6 +59,14 @@ end
 -- ctx = { sel, target, ft, buf, chunks }: 在异步前捕获的选择时上下文
 -- handlers.setup(ctx): 启动服务器前调用(如先开侧栏窗口)
 -- handlers.on_chunk / on_done: 透传给 pipeline.run, on_done 额外带 ctx
+-- 智能分屏方向: vsplit 后当前窗口只剩一半宽度; 低于最小可读宽度则上下分屏(保留全宽)
+local function split_direction()
+    if math.floor(vim.api.nvim_win_get_width(0) / 2) < config.min_side_width then
+        return "split"
+    end
+    return "vsplit"
+end
+
 local function translate_selection(from_visual, handlers)
     local sel = get_text(from_visual)
     if not sel or sel.text == "" then
@@ -90,7 +99,7 @@ function M.split(from_visual)
     translate_selection(from_visual, {
         setup = function(ctx)
             -- 先建好侧栏 buffer, 各块译文到达后逐块追加(块间仅换行, 保持原文行结构)
-            vim.cmd("vsplit")
+            vim.cmd(split_direction())
             vim.cmd("enew")
             buf = vim.api.nvim_get_current_buf()
             vim.bo[buf].buftype = "nofile"

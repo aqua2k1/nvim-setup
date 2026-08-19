@@ -104,3 +104,11 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_node_provider = 0
 
 vim.opt.winborder = 'rounded'
+
+-- Neovide (GUI): font with Nerd Font glyphs. Ignored in terminal.
+-- 0.16.x sets g:neovide_version but not g:neovide; nvim 0.12's default
+-- guifont (Source Code Pro) has no Nerd glyphs, so set it explicitly.
+-- Neovide picks it up via OptionSet/VimEnter.
+if vim.g.neovide_version then
+  vim.o.guifont = 'FiraCode\\ Nerd\\ Font:h12'
+end

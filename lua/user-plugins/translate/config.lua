@@ -7,6 +7,7 @@ local M = {
     idle_seconds = 600,  -- 闲置后自动卸载模型，下次请求自动重新加载
     max_chunk_chars = 1500,  -- 单次请求原文上限(字符); 超出按行分块, 逐块串行翻译
     max_retries = 3,  -- 单块翻译失败的最大重试次数(2s/4s/6s... 递增退避)
+    min_side_width = 80,  -- vsplit 时单栏最小宽度(列); 低于则改用上下分屏
 }
 
 M.api_url = string.format("http://%s:%d/v1/chat/completions", M.host, M.port)
