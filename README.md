@@ -40,9 +40,9 @@ Treesitter core parsers install automatically.
 │   ├── plugins/              # Plugin specs (lazy.nvim)
 │   │   ├── cmp.lua           # blink.cmp
 │   │   ├── file.lua          # oil.nvim
-│   │   ├── git.lua           # gitsigns.nvim
+│   │   ├── git.lua           # codediff.nvim
 │   │   ├── lsp.lua           # nvim-lspconfig
-│   │   ├── markdown.lua      # render-markdown.nvim
+│   │   ├── markdown.lua      # markview.nvim
 │   │   ├── mini.lua          # mini.surround / mini.pairs
 │   │   ├── pick.lua          # fzf-lua
 │   │   ├── snacks.lua        # snacks.nvim
@@ -107,20 +107,33 @@ Leader key: `<Space>`
 | `[e` / `]e` | Prev / next error |
 | `[w` / `]w` | Prev / next warning |
 
-### Git (gitsigns)
+### Git (codediff)
+
+Entry keymaps:
 
 | Key | Description |
 |-----|-------------|
-| `[h` / `]h` | Prev / next hunk |
-| `[H` / `]H` | First / last hunk |
-| `<leader>gS` | Stage hunk |
-| `<leader>gR` | Reset hunk |
-| `<leader>gs` | Stage buffer |
-| `<leader>gr` | Reset buffer |
-| `<leader>gb` | Blame line |
-| `<leader>gB` | Blame buffer |
-| `<leader>gd` | Diff this |
-| `ih` | Select hunk (operator) |
+| `<leader>gd` | CodeDiff: file vs HEAD |
+| `<leader>gD` | CodeDiff: file vs HEAD~1 |
+| `<leader>ge` | CodeDiff: changed files |
+| `<leader>gh` | CodeDiff: commit history |
+
+Inside CodeDiff view:
+
+| Key | Description |
+|-----|-------------|
+| `q` | Quit |
+| `t` | Toggle side-by-side / inline |
+| `gc` | Toggle compact (fold unchanged) |
+| `]c` / `[c` | Next / prev hunk |
+| `]f` / `[f` | Next / prev file |
+| `-` | Stage / unstage current file |
+| `S` / `U` | Stage / unstage all |
+| `X` | Restore (discard changes) |
+| `<leader>hs` / `hu` / `hr` | Hunk stage / unstage / discard |
+| `do` / `dp` | Diff get / put |
+| `<leader>go` / `gt` | Accept ours / theirs (conflict) |
+| `]x` / `[x` | Next / prev conflict |
 
 ### Buffers & Windows
 

@@ -119,14 +119,6 @@ local groups = {
     gitcommitSelectedFile         = { fg = colors.green },
     gitcommitDiscardedFile        = { fg = colors.red },
 
-    -- gitsigns.nvim
-    GitSignsAdd                   = { fg = colors.green },
-    GitSignsChange                = { fg = colors.magenta },
-    GitSignsDelete                = { fg = colors.red },
-    GitSignsAddLn                 = { fg = colors.green },
-    GitSignsChangeLn              = { fg = colors.magenta },
-    GitSignsDeleteLn              = { fg = colors.red },
-
     -- diff
     diffAdded                     = { fg = colors.green },
     diffRemoved                   = { fg = colors.red },
