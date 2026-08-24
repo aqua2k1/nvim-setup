@@ -23,10 +23,16 @@ vim.o.linebreak = true
 -- WSL: pin xclip so provider detection does not walk the huge Windows PATH.
 local is_wsl = vim.fn.has("wsl") == 1
   or (vim.uv.os_uname().release or ""):lower():find("microsoft", 1, true) ~= nil
+local is_ssh = vim.env.SSH_CONNECTION ~= nil or vim.env.SSH_TTY ~= nil
 
 vim.o.clipboard = "unnamedplus"
 
 if vim.env.TMUX then
+  -- tmux 会转发 OSC 52（同样适用于 ssh 会话内）
+  vim.g.clipboard = "osc52"
+elseif is_ssh then
+  -- SSH 直连：服务器上没有 X/Wayland，改由本地终端转发剪贴板（OSC 52）。
+  -- 要求本地终端支持 OSC 52：iTerm2 / kitty / WezTerm / Windows Terminal 等均支持。
   vim.g.clipboard = "osc52"
 elseif is_wsl then
   vim.g.clipboard = {
