@@ -85,6 +85,7 @@ function M.input_command()
     -- local buf_ft = vim.api.nvim_get_option_value('filetype', { buf = 0 })
     local opts = {
         close_on_exit = false,
+        clear_env = false,
         on_open = function()
             -- clear qf
             vim.fn.setqflist({}, 'r')
@@ -98,6 +99,7 @@ function M.input_command()
             vim.fn.setqflist({}, "a", { lines = data })
         end
     }
+    opts = vim.tbl_extend("force", opts, M.float_term())
 
     vim.ui.input({ prompt = 'Enter Command: ' }, function(input)
         if not input then
