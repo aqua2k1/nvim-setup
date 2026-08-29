@@ -56,7 +56,6 @@ vim.api.nvim_create_autocmd("FileType", {
         "checkhealth",
         "grug-far",
         "help",
-        "lspinfo",
         "neotest-output",
         "neotest-output-panel",
         "neotest-summary",

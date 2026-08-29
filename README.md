@@ -1,6 +1,6 @@
 # nvim-setup
 
-Personal Neovim configuration. Fast, minimal, LSP-first.
+Personal Neovim configuration focused on viewing code and files and editing prompts.
 
 ## Prerequisites
 
@@ -41,7 +41,6 @@ Treesitter core parsers install automatically.
 │   │   ├── cmp.lua           # blink.cmp
 │   │   ├── file.lua          # oil.nvim
 │   │   ├── git.lua           # codediff.nvim
-│   │   ├── lsp.lua           # nvim-lspconfig
 │   │   ├── markdown.lua      # markview.nvim
 │   │   ├── mini.lua          # mini.surround / mini.pairs
 │   │   ├── pick.lua          # fzf-lua
@@ -52,16 +51,7 @@ Treesitter core parsers install automatically.
 │   │   └── which_key.lua     # which-key.nvim
 │   ├── user-plugins/
 │   │   └── translate/        # AI translation plugin
-│   └── utils/                # Icons, colors, helpers
-├── lsp/                      # Per-language LSP configs
-│   ├── basedpyright.lua      # Python
-│   ├── biome.lua             # JS/TS lint/format
-│   ├── clangd.lua            # C/C++
-│   ├── gopls.lua             # Go
-│   ├── lua_ls.lua            # Lua
-│   ├── ruff.lua              # Python lint
-│   ├── rust_analyzer.lua     # Rust
-│   └── ts_ls.lua             # TypeScript/JavaScript
+│   └── utils/                # Shared color palette
 ├── colors/                   # Colorschemes
 ├── snippets/                 # Code snippets
 └── scripts/
@@ -85,27 +75,6 @@ Leader key: `<Space>`
 | `<leader>fh` | Help tags |
 | `<leader>fk` | Keymaps |
 | `<leader>fc` | Commands |
-
-### LSP
-
-| Key | Description |
-|-----|-------------|
-| `gd` | Go to definition |
-| `K` | Hover documentation |
-| `grf` | Format buffer |
-| `<leader>fd` | Fzf: definitions |
-| `<leader>fr` | Fzf: references |
-| `<leader>fa` | Fzf: code actions |
-| `<leader>fs` | Fzf: document symbols |
-| `<leader>fS` | Fzf: workspace symbols |
-
-### Diagnostics
-
-| Key | Description |
-|-----|-------------|
-| `[d` / `]d` | Prev / next diagnostic |
-| `[e` / `]e` | Prev / next error |
-| `[w` / `]w` | Prev / next warning |
 
 ### Git (codediff)
 
@@ -181,7 +150,6 @@ See [Translation](#translation) for setup.
 | `<leader>q` | Toggle quickfix |
 | `[q` / `]q` | Prev / next quickfix |
 | `<leader>?` | Buffer-local keymaps (which-key) |
-| `]]` / `[[` | Jump to next / prev word reference |
 | `<F10>` | Lazy dashboard |
 
 ### Motion
@@ -191,26 +159,6 @@ See [Translation](#translation) for setup.
 | `j` / `k` | gj / gk (visual line) |
 | `gh` / `gl` | Line start / end |
 | `gm` | Match bracket (%) |
-
-## LSP Setup
-
-LSP servers are auto-enabled from configs in `lsp/`. Install the corresponding server binary for each language:
-
-| Language | Server | Install |
-|----------|--------|---------|
-| Python | `basedpyright` | `pip install basedpyright` |
-| Python (lint) | `ruff` | `pip install ruff` |
-| C/C++ | `clangd` | package manager (`clangd`) |
-| Go | `gopls` | `go install golang.org/x/tools/gopls@latest` |
-| Rust | `rust-analyzer` | `rustup component add rust-analyzer` |
-| TypeScript/JS | `typescript-language-server` | `npm i -g typescript-language-server` |
-| JS/TS lint | `biome` | `npm i -g @biomejs/biome` |
-| Lua | `lua-language-server` | package manager |
-
-LSP features on attach:
-- Auto document highlight on cursor hold
-- Float diagnostic on cursor hold (copyable text)
-- Diagnostic signs in signcolumn
 
 ## Translation
 
@@ -257,5 +205,4 @@ Uses OSC 52 for clipboard when in SSH sessions — no extra setup needed.
 ## Customization
 
 - `.nvim.lua` or `.nvimrc` in any project directory is auto-loaded (`exrc = true`)
-- Add new LSP server configs under `lsp/` — they are picked up automatically
 - Add new lazy plugin specs under `lua/plugins/` — imported via `{ import = "plugins" }`

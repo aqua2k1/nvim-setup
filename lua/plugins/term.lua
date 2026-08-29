@@ -30,9 +30,6 @@ local M = {
                 vim.cmd('TermExec cmd="exit"')
             end, opts)
         end,
-        on_close = function()
-            vim.print("yes")
-        end,
         float_opts = {
             border = "double",
             title_pos = "center",

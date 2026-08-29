@@ -106,6 +106,11 @@ function M.split(from_visual)
             vim.bo[buf].bufhidden = "wipe"
             vim.bo[buf].filetype = ctx.ft
             vim.api.nvim_buf_set_name(buf, "Translation")
+            vim.keymap.set("n", "q", "<cmd>close<cr>", {
+                buffer = buf,
+                silent = true,
+                desc = "Close translation buffer",
+            })
         end,
         on_chunk = function(result, i, _total, ctx)
             if not vim.api.nvim_buf_is_valid(buf) then

@@ -12,13 +12,6 @@ local M = {
         -- Buffers
         { "<leader>,",  function() require('fzf-lua').buffers({ prompt = 'Buffer> ', cwd_prompt = false }) end, desc = "Switch Buffer" },
         { "<leader>bb", function() require('fzf-lua').buffers({ prompt = 'Buffer> ', cwd_prompt = false }) end, desc = "Buffers" },
-        -- LSP
-        { "<leader>fd", function() require('fzf-lua').lsp_definitions({ prompt = 'Definitions> ' }) end,         desc = "Definitions" },
-        { "<leader>fr", function() require('fzf-lua').lsp_references({ prompt = 'References> ' }) end,          desc = "References" },
-        { "<leader>fa", function() require('fzf-lua').lsp_code_actions({ prompt = 'Code Actions> ' }) end,      desc = "Code Actions" },
-        { "<leader>fs", function() require('fzf-lua').lsp_document_symbols({ prompt = 'Symbols> ' }) end,       desc = "Document Symbols" },
-        { "<leader>fS", function() require('fzf-lua').lsp_workspace_symbols({ prompt = 'Workspace> ' }) end,    desc = "Workspace Symbols" },
-
         -- 其他
         { "<leader>fh", function() require('fzf-lua').helptags({ prompt = 'Help> ' }) end,                      desc = "Help" },
         { "<leader>fk", function() require('fzf-lua').keymaps({ prompt = 'Keymaps> ' }) end,                    desc = "Keymaps" },

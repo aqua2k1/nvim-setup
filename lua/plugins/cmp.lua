@@ -26,12 +26,6 @@ local M = {
                     },
                 },
             },
-            signature = {
-                enabled = true,
-                window = {
-                    border = 'rounded'
-                },
-            },
             cmdline = {
                 completion = {
                     menu = {
@@ -53,7 +47,7 @@ local M = {
                         score_offset = 100,
                     },
                 },
-                default = { 'snippets', 'lsp', 'path', 'buffer', 'pi_agent' },
+                default = { 'snippets', 'path', 'buffer', 'pi_agent' },
             },
         },
     },

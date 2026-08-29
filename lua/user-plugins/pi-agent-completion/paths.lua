@@ -11,7 +11,6 @@ local function make_item(display, insert, is_dir)
     return {
         label = display,
         kind = is_dir and kinds.Folder or kinds.File,
-        insertTextFormat = vim.lsp.protocol.InsertTextFormat.PlainText,
         insertText = insert,
         detail = display,
     }

@@ -19,11 +19,6 @@ for group, settings in pairs({
     StatuslineModeSelect      = { fg = colors.magenta, bold = true },
     StatuslineEncoding        = { fg = colors.green, bold = true },
     StatuslinePosition        = { fg = colors.white, bold = true },
-    StatuslineLSPClients      = { fg = colors.white, bold = true },
-    StatuslineDiagnosticError = { fg = colors.red, bold = true },
-    StatuslineDiagnosticWarn  = { fg = colors.yellow, bold = true },
-    StatuslineDiagnosticHint  = { fg = colors.dblue, bold = true },
-    StatuslineDiagnosticInfo  = { fg = colors.cyan, bold = true },
 }) do
     vim.api.nvim_set_hl(0, group, settings)
 end
@@ -136,75 +131,6 @@ function M.git_component()
     return "%#StatuslineGit# Git-" .. git_head
 end
 
----@type table<string, string?>
-local progress_status = {
-    client = nil,
-    kind = nil,
-    title = nil,
-}
-
-vim.api.nvim_create_autocmd('LspProgress', {
-    group = vim.api.nvim_create_augroup('mingzi47/statusline', { clear = true }),
-    desc = 'Update LSP progress in statusline',
-    pattern = { 'begin', 'end' },
-    callback = function(args)
-        -- This should in theory never happen, but I've seen weird errors.
-        if not args.data then
-            return
-        end
-
-        progress_status = {
-            client = vim.lsp.get_client_by_id(args.data.client_id).name,
-            kind = args.data.params.value.kind,
-            title = args.data.params.value.title,
-        }
-
-        if progress_status.kind == 'end' then
-            progress_status.title = nil
-            -- Wait a bit before clearing the status.
-            vim.defer_fn(function()
-                vim.cmd.redrawstatus()
-            end, 3000)
-        else
-            vim.cmd.redrawstatus()
-        end
-    end,
-})
-
---- The current buffer attach clients: (clangd, lua_ls)
----@return string
-function M.lsp_clients()
-    local clients = vim.lsp.get_clients()
-    local current_buf = vim.api.nvim_get_current_buf()
-
-    local active_clients = vim.tbl_filter(function(client)
-        return client and client.attached_buffers and client.attached_buffers[current_buf]
-    end, clients)
-
-    local client_names = vim.tbl_map(function(client)
-        return client.name or "unknown"
-    end, active_clients)
-
-    if #active_clients == 0 then
-        return ""
-    end
-
-    return "%#StatuslineLSPClients#(" .. table.concat(client_names, ", ") .. ")"
-end
-
---- The latest LSP progress message, 纯文字: clangd: Building...
----@return string
-function M.lsp_progress_component()
-    if not progress_status.client or not progress_status.title then
-        return M.lsp_clients()
-    end
-
-    return table.concat {
-        string.format('%%#StatuslineTitle#%s:', progress_status.client),
-        string.format(' %%#StatuslineItalic#%s...', progress_status.title),
-    }
-end
-
 --- 位置: 百分比 + (行,零基列)  如 60% (25,10)
 ---@return string
 function M.position_component()
@@ -216,41 +142,7 @@ function M.position_component()
         .. " (%l,%{col('.')-1})"
 end
 
-local last_diagnostic_component = ''
---- 诊断计数（flycheck 文字，作 minor-mode 放模式括号内）: E3 W1
----@return string
-function M.diagnostics_component()
-    -- Use the last computed value if in insert mode.
-    if vim.startswith(vim.api.nvim_get_mode().mode, 'i') then
-        return last_diagnostic_component
-    end
-
-    local counts = vim.iter(vim.diagnostic.get(0)):fold({
-        ERROR = 0,
-        WARN = 0,
-        HINT = 0,
-        INFO = 0,
-    }, function(acc, diagnostic)
-        local severity = vim.diagnostic.severity[diagnostic.severity]
-        acc[severity] = acc[severity] + 1
-        return acc
-    end)
-
-    local parts = {}
-    local letters = { ERROR = "E", WARN = "W", HINT = "H", INFO = "I" }
-    for severity, count in pairs(counts) do
-        if count > 0 then
-            local name = severity:sub(1, 1) .. severity:sub(2):lower()
-            table.insert(parts, string.format('%%#StatuslineDiagnostic%s#%s%d', name, letters[severity], count))
-        end
-    end
-
-    -- 更新缓存并返回结果
-    last_diagnostic_component = table.concat(parts, ' ')
-    return last_diagnostic_component
-end
-
---- 模式（Emacs mode-line-modes）: [(Lua E1 W2)]，诊断作 minor-mode 并入
+--- 模式（Emacs mode-line-modes）: [(Lua)]
 ---@return string
 function M.mode_component_menlo()
     local ft = vim.bo.filetype
@@ -260,10 +152,6 @@ function M.mode_component_menlo()
         ft = ft:gsub('^%w', string.upper)
     end
     local inner = '%#StatuslineMode#(' .. ft .. ')'
-    local diag = M.diagnostics_component()
-    if diag ~= '' then
-        inner = inner .. ' ' .. diag
-    end
     return '%#StatuslineMode#[' .. inner .. ']'
 end
 
@@ -285,7 +173,6 @@ function M.render()
         M.position_component(),
         M.git_component(),
         M.mode_component_menlo(),
-        M.lsp_progress_component(),
     } .. ' '
 end
 

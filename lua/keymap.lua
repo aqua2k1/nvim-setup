@@ -8,7 +8,7 @@ map({ "n", "v", "o" },  "gl", "$",                   { silent = true, desc = "Li
 map({ "n", "o", "x", "v" }, "gm", "%",               { desc = "Match" })
 
 -- Insert / command navigation
-map({ "i", "c" }, "<C-h>", "<Left>",  { silent = true, desc = "Left" })
+map("i", "<C-h>", "<Left>",  { silent = true, desc = "Left" })
 map({ "i", "c" }, "<C-l>", "<Right>", { silent = true, desc = "Right" })
 map({ "i", "c" }, "<C-k>", "<Up>",    { silent = true, desc = "Up" })
 map({ "i", "c" }, "<C-j>", "<Down>",  { silent = true, desc = "Down" })
@@ -26,19 +26,6 @@ map("v", ">", ">gv", { desc = "Indent right" })
 -- Comments
 map("n", "gco", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add comment below" })
 map("n", "gcO", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add comment above" })
-
--- Diagnostics
-local function diag_jump(count, severity)
-    return function()
-        vim.diagnostic.jump({ count = count, severity = severity and vim.diagnostic.severity[severity] })
-    end
-end
-map("n", "]d", diag_jump(1),           { desc = "Next diagnostic" })
-map("n", "[d", diag_jump(-1),          { desc = "Prev diagnostic" })
-map("n", "]e", diag_jump(1,  "ERROR"), { desc = "Next error" })
-map("n", "[e", diag_jump(-1, "ERROR"), { desc = "Prev error" })
-map("n", "]w", diag_jump(1,  "WARN"),  { desc = "Next warning" })
-map("n", "[w", diag_jump(-1, "WARN"),  { desc = "Prev warning" })
 
 -- Windows
 map("n", "<C-Up>",    "<cmd>resize +2<cr>",          { desc = "Increase window height" })

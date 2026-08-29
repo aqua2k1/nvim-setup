@@ -6,7 +6,10 @@ local M = {
         'nvim-mini/mini.icons',
     },
     opts = {
-        preview = { icon_provider = 'mini' },   -- 复用 mini.icons（原 render-markdown 也用）
+        preview = {
+            icon_provider = 'mini',   -- 复用 mini.icons（原 render-markdown 也用）
+            ignore_buftypes = {},
+        },
         -- hybrid_mode 默认开启 = 原 render_modes = {'i','n','c','t'}（边编辑边预览）
     },
     config = function(_, opts)

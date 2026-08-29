@@ -88,33 +88,6 @@ local groups = {
     Whitespace                    = { fg = colors.bg2 },
     Delimiter                     = { fg = colors.orange },
 
-    -- LSP Diagnostic
-    DiagnosticError               = { fg = colors.red },
-    DiagnosticSignError           = { fg = colors.red },
-    DiagnosticUnderlineError      = { undercurl = true, sp = colors.red },
-    DiagnosticWarn                = { fg = colors.yellow },
-    DiagnosticSignWarn            = { fg = colors.yellow },
-    DiagnosticUnderlineWarn       = { undercurl = true, sp = colors.yellow },
-    DiagnosticInfo                = { fg = colors.dblue },
-    DiagnosticSignInfo            = { fg = colors.blue },
-    DiagnosticUnderlineInfo       = { undercurl = true, sp = colors.dblue },
-    DiagnosticHint                = { fg = colors.aqua },
-    DiagnosticSignHint            = { fg = colors.aqua },
-    DiagnosticUnderlineHint       = { undercurl = true, sp = colors.aqua },
-    DiagnosticFloatingError       = { fg = colors.red },
-    DiagnosticFloatingWarn        = { fg = colors.orange },
-    DiagnosticFloatingInfo        = { fg = colors.dblue },
-    DiagnosticFloatingHint        = { fg = colors.aqua },
-    DiagnosticVirtualTextError    = { fg = colors.red },
-    DiagnosticVirtualTextWarn     = { fg = colors.yellow },
-    DiagnosticVirtualTextInfo     = { fg = colors.dblue },
-    DiagnosticVirtualTextHint     = { fg = colors.aqua },
-    LspReferenceRead              = { fg = colors.yellow, bold = true },
-    LspReferenceText              = { fg = colors.yellow, bold = true },
-    LspReferenceWrite             = { fg = colors.orange, bold = true },
-    LspCodeLens                   = { fg = colors.gray },
-    LspSignatureActiveParameter   = { link = 'Search' },
-
     -- gitcommit
     gitcommitSelectedFile         = { fg = colors.green },
     gitcommitDiscardedFile        = { fg = colors.red },
@@ -242,24 +215,6 @@ local groups = {
     ['@punctuation']              = { link = 'Delimiter' },
     ['@macro']                    = { link = 'Macro' },
     ['@structure']                = { link = 'Structure' },
-
-    -- Semantic tokens.
-    ['@lsp.type.class']           = { link = '@constructor' },
-    ['@lsp.type.comment']         = {}, -- do not overwrite comments
-    ['@lsp.type.decorator']       = { link = '@parameter' },
-    ['@lsp.type.enum']            = { link = '@type' },
-    ['@lsp.type.enumMember']      = { link = '@constant' },
-    ['@lsp.type.function']        = { link = '@function' },
-    ['@lsp.type.interface']       = { link = '@keyword' },
-    ['@lsp.type.macro']           = { link = '@macro' },
-    ['@lsp.type.method']          = { link = '@method' },
-    ['@lsp.type.namespace']       = { link = '@namespace' },
-    ['@lsp.type.parameter']       = { link = '@parameter' },
-    ['@lsp.type.property']        = { link = '@property' },
-    ['@lsp.type.struct']          = { link = '@constructor' },
-    ['@lsp.type.type']            = { link = '@type' },
-    ['@lsp.type.typeParameter']   = { link = '@type.definition' },
-    ['@lsp.type.variable']        = { link = '@variable' },
 }
 
 -- add highlights

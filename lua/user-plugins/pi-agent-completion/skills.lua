@@ -76,7 +76,6 @@ function M.suggest(cwd, query, on_items)
             table.insert(items, {
                 label = s.name,
                 kind = kind,
-                insertTextFormat = vim.lsp.protocol.InsertTextFormat.PlainText,
                 insertText = "/skill:" .. s.name .. " ",
                 detail = (s.description or "") .. "  [" .. s.scope .. "]",
             })

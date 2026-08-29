@@ -3,7 +3,7 @@ local M = {
     cmd = 'CodeDiff',
     -- VSCode 风格 diff/merge/history 查看器，替代 gitsigns 的 diffthis + qflist + 冲突解决
     opts = {
-        -- 行级只设置低饱和背景，保留 Treesitter/LSP 的多色前景；
+        -- 行级只设置低饱和背景，保留 Treesitter 的多色前景；
         -- 具体改动字符使用主题的 DiffText，以高对比度突出差异。
         highlights = {
             line_insert = '#62693e', -- gruvbox.nvim dark_green
