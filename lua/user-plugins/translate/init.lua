@@ -4,22 +4,48 @@
 --   <leader>at  翻译选中/全文到侧栏 scratch buffer
 --   <leader>aT  翻译选中/全文并替换当前 buffer
 -- 结构:
---   config     配置(host/port/模型/分块/重试)
---   transport  curl HTTP 层(唯一处理 vim.schedule 调度的地方)
---   server     llama-server 生命周期(ensure/start/poll)
+--   config     配置(host/port/分块/重试)
+--   transport  curl HTTP 层 + 服务可用性检查(唯一处理 vim.schedule 调度的地方)
 --   pipeline   分块 + 串行翻译 + 重试管线
 -- 长文本按行分块(≤ max_chunk_chars 字符/块)串行翻译, 逐块追加到侧栏
 
 local M = {}
 
 local config = require("user-plugins.translate.config")
-local server = require("user-plugins.translate.server")
+local transport = require("user-plugins.translate.transport")
 local pipeline = require("user-plugins.translate.pipeline")
 
 -- ====== 用户交互 ======
 
+local function input_with_replace_default(prompt, default)
+    local first_input = true
+    local ns = vim.api.nvim_create_namespace("translate-input-default")
+
+    vim.on_key(function(key, typed)
+        -- input() inserts its default through non-typed keys. Only react to
+        -- the first key actually entered by the user.
+        if not first_input or typed == "" then return end
+
+        local key_name = vim.fn.keytrans(key)
+        if key_name == "<CR>" or key_name == "<NL>" or key_name == "<Esc>" then
+            first_input = false
+            return
+        end
+
+        if vim.fn.getcmdline() == default then
+            vim.fn.setcmdline("", 1)
+        end
+        first_input = false
+    end, ns)
+
+    local ok, value = pcall(vim.fn.input, prompt, default)
+    vim.on_key(nil, ns)
+    if not ok then error(value) end
+    return value
+end
+
 local function get_target_lang()
-    local target = vim.fn.input("Translate to (en/zh): ", "zh")
+    local target = input_with_replace_default("Translate to (en/zh): ", "zh")
     if target == "" then return nil end
     target = target:lower()
     if target ~= "en" and target ~= "zh" then
@@ -55,9 +81,9 @@ end
 
 -- ====== 公共编排 ======
 
--- 选区/全文 → 语言 → 分块 → 确保服务器 → 跑管线
+-- 选区/全文 → 语言 → 分块 → 检查服务 → 跑管线
 -- ctx = { sel, target, ft, buf, chunks }: 在异步前捕获的选择时上下文
--- handlers.setup(ctx): 启动服务器前调用(如先开侧栏窗口)
+-- handlers.setup(ctx): HTTP 检查前立即调用(如打开侧栏窗口)
 -- handlers.on_chunk / on_done: 透传给 pipeline.run, on_done 额外带 ctx
 -- 智能分屏方向: vsplit 后当前窗口只剩一半宽度; 低于最小可读宽度则上下分屏(保留全宽)
 local function split_direction()
@@ -80,10 +106,16 @@ local function translate_selection(from_visual, handlers)
         target = target,
         ft = vim.bo.filetype,
         buf = vim.api.nvim_get_current_buf(),
+        changedtick = vim.api.nvim_buf_get_changedtick(0),
         chunks = pipeline.split_into_chunks(sel.text),
     }
     if handlers.setup then handlers.setup(ctx) end
-    server.ensure(function()
+    transport.get_health(function(ok, err)
+        if not ok then
+            local detail = err and ("\n" .. err) or ""
+            vim.notify("Translation service unavailable" .. detail, vim.log.levels.ERROR)
+            return
+        end
         pipeline.run(ctx.chunks, ctx.target, ctx.ft, {
             on_chunk = handlers.on_chunk
                 and function(result, i, total) return handlers.on_chunk(result, i, total, ctx) end,
@@ -149,8 +181,16 @@ end
 function M.replace(from_visual)
     translate_selection(from_visual, {
         on_done = function(parts, ctx)
-            if #parts == 0 then return end  -- 失败原因已由 pipeline 通知
+            if #parts ~= #ctx.chunks then return end  -- 失败原因已由 pipeline 通知; 禁止部分替换
             local buf, sel = ctx.buf, ctx.sel
+            if not vim.api.nvim_buf_is_valid(buf) then
+                vim.notify("Source buffer no longer exists; translation not applied", vim.log.levels.WARN)
+                return
+            end
+            if vim.api.nvim_buf_get_changedtick(buf) ~= ctx.changedtick then
+                vim.notify("Source buffer changed; translation not applied", vim.log.levels.WARN)
+                return
+            end
             local lines = vim.split(pipeline.join(parts, ctx.chunks), "\n", { plain = true })
             if lines[#lines] == "" then table.remove(lines) end
 

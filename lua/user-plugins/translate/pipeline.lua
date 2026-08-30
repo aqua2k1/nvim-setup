@@ -120,7 +120,7 @@ function M.run(chunks, target, ft, opts)
                 if not result then
                     if retries < config.max_retries then
                         retries = retries + 1
-                        vim.defer_fn(attempt, 2 * retries)  -- 退避 2s/4s/6s...
+                        vim.defer_fn(attempt, 2000 * retries)  -- 退避 2s/4s/6s...
                     else
                         local detail = err and string.format(" (%s)", err) or ""
                         vim.notify(string.format("✗ Translation failed at chunk %d/%d%s", i, #chunks, detail), vim.log.levels.ERROR)

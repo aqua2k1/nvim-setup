@@ -12,7 +12,7 @@ Personal Neovim configuration focused on viewing code and files and editing prom
 
 ### Optional
 
-- [llama.cpp](https://github.com/ggerganov/llama.cpp) + `llama-server` — built-in AI translation (`<leader>at` / `<leader>aT`)
+- Python >= 3.10 + `curl` + `llama-server` in `PATH` + systemd (Linux) — built-in AI translation (`<leader>at` / `<leader>aT`)
 - [macism](https://github.com/laishulu/macism) — auto IME switch on macOS
 
 ## Install
@@ -55,7 +55,9 @@ Treesitter core parsers install automatically.
 ├── colors/                   # Colorschemes
 ├── snippets/                 # Code snippets
 └── scripts/
-    └── llama-translate.sh    # Translation model setup
+    ├── llama-translate.sh            # Translation model + service setup
+    ├── llama-translate-service.py    # Idempotent systemd synchronizer
+    └── systemd/                      # Canonical service template
 ```
 
 ## Keymaps
@@ -130,7 +132,7 @@ Inside CodeDiff view:
 
 In terminal mode: `<Esc><Esc>` to enter normal mode, `<C-w>` + hjkl to navigate.
 
-### Translation (requires llama.cpp)
+### Translation (requires llama-server)
 
 | Key | Description |
 |-----|-------------|
@@ -162,16 +164,36 @@ See [Translation](#translation) for setup.
 
 ## Translation
 
-Built-in AI translation using local [llama.cpp](https://github.com/ggerganov/llama.cpp) with the Hy-MT2 model.
+Built-in AI translation using a local [llama.cpp](https://github.com/ggerganov/llama.cpp) server with the Hy-MT2 model. Systemd owns the server lifecycle; Neovim only checks and uses its HTTP API.
 
-### Setup
+### Setup (Linux/systemd)
+
+Install `llama-server` with the machine's package manager and ensure this succeeds in your shell:
 
 ```bash
-# One-time setup
+which llama-server
+```
+
+Then run:
+
+```bash
 ./scripts/llama-translate.sh
 ```
 
-This clones llama.cpp, builds it, and downloads the translation model (`Hy-MT2-1.8B-Q4_K_M.gguf`).
+The setup script downloads `Hy-MT2-1.8B-Q4_K_M.gguf` to `~/models/`, discovers the machine-specific `llama-server` path with `which`, and installs `/etc/systemd/system/llama-server.service`. The service is enabled at boot, binds only to `127.0.0.1:9999`, restarts after any unexpected exit with a 60-second delay and no start-rate limit, and unloads the model after 10 idle minutes.
+
+To synchronize another machine after updating this repository, run the same setup command there. The installer renders that machine's username, home, and package-manager binary path and does not restart an unchanged healthy service.
+
+Service operations:
+
+```bash
+python3 scripts/llama-translate-service.py check
+python3 scripts/llama-translate-service.py status
+sudo systemctl restart llama-server.service
+journalctl -u llama-server.service -f
+```
+
+If Neovim reports that the service is unavailable, inspect systemd; Neovim never starts or restarts `llama-server` itself.
 
 ### Usage
 

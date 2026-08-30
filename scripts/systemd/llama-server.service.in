@@ -1,0 +1,18 @@
+# Managed by nvim-setup/scripts/llama-translate-service.py
+[Unit]
+Description=llama-server (Hy-MT2 translation)
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=@USER@
+ExecStart="@LLAMA_SERVER@" \
+    -m "@MODEL@" \
+    -ngl 99 -c 8192 -np 1 \
+    --port 9999 --host 127.0.0.1 \
+    --sleep-idle-seconds 600
+Restart=always
+RestartSec=60s
+
+[Install]
+WantedBy=multi-user.target

@@ -6,7 +6,7 @@ local M = {}
 local config = require("user-plugins.translate.config")
 
 local function curl(extra_args, cb)
-    local argv = { "curl", "-s" }
+    local argv = { "curl", "-sS" }
     for _, a in ipairs(extra_args) do
         argv[#argv + 1] = a
     end
@@ -15,10 +15,23 @@ local function curl(extra_args, cb)
     end)
 end
 
--- GET /health → cb(ok)
+-- GET /health → cb(ok, err)
 function M.get_health(cb)
-    curl({ config.health_url }, function(r)
-        cb(r.code == 0 and r.stdout and r.stdout:find('"ok"'))
+    curl({
+        "--connect-timeout", "1",
+        "--max-time", "2",
+        "--fail-with-body",
+        config.health_url,
+    }, function(r)
+        if r.code ~= 0 then
+            local detail = r.stderr and vim.trim(r.stderr) or "curl failed"
+            return cb(false, detail ~= "" and detail or "curl failed")
+        end
+        local ok, decoded = pcall(vim.json.decode, r.stdout or "")
+        if not ok or type(decoded) ~= "table" or decoded.status ~= "ok" then
+            return cb(false, "unexpected health response")
+        end
+        cb(true)
     end)
 end
 
@@ -34,6 +47,7 @@ function M.translate(text, target, ft, cb)
 
     curl({
         "--max-time", "120",
+        "--fail-with-body",
         "-X", "POST", config.api_url,
         "-H", "Content-Type: application/json",
         "-d", vim.json.encode({
@@ -47,10 +61,14 @@ function M.translate(text, target, ft, cb)
             return cb(nil, "curl failed: " .. (r.stderr or "unknown"))
         end
         local ok, decoded = pcall(vim.json.decode, r.stdout)
-        if not ok or not decoded.choices or not decoded.choices[1] then
+        local choice = ok and type(decoded) == "table"
+            and type(decoded.choices) == "table" and decoded.choices[1]
+        local content = type(choice) == "table" and type(choice.message) == "table"
+            and choice.message.content
+        if type(content) ~= "string" then
             return cb(nil, "unexpected response")
         end
-        cb(decoded.choices[1].message.content)
+        cb(content)
     end)
 end
 
