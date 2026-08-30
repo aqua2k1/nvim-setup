@@ -92,6 +92,17 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     end,
 })
 
+-- Normalize line endings before saving
+vim.api.nvim_create_autocmd("BufWritePre", {
+    group = augroup("normalize_line_endings"),
+    callback = function(event)
+        vim.bo[event.buf].fileformat = "unix"
+        vim.api.nvim_buf_call(event.buf, function()
+            vim.cmd([[silent! keeppatterns %s/\r$//e]])
+        end)
+    end,
+})
+
 -- automatically enter insert mode on opening terminal
 vim.api.nvim_create_autocmd("TermOpen", {
     group = augroup("terminal"),
