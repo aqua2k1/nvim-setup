@@ -7,6 +7,7 @@ Personal Neovim configuration focused on viewing code and files and editing prom
 - **Neovim >= 0.10** (uses `vim.loader`, `snacks.nvim`, `blink.cmp`)
 - **git** — plugin management
 - **ripgrep** (`rg`) — grep provider
+- **fd** — recursive fuzzy path completion
 - **cargo** (Rust) — `blink.cmp` build
 - xclip (WSL only) — clipboard sync
 
@@ -117,8 +118,11 @@ Inside CodeDiff view:
 | `<leader>bs` | Horizontal split |
 | `<leader>bc` | New empty buffer |
 | `<leader>e` | Oil file explorer |
+| `<leader>w` + window key | Window commands (same as `<C-w>`) |
 | `<C-Up/Down>` | Resize height |
 | `<C-Left/Right>` | Resize width |
+
+`<leader>w` is a Normal-mode waiting prefix backed by which-key; press a window command key after it to run the corresponding `<C-w>` command.
 
 ### Terminal
 
@@ -223,6 +227,12 @@ brew install macism
 ### SSH
 
 Uses OSC 52 for clipboard when in SSH sessions — no extra setup needed.
+
+## Path Completion
+
+The built-in Blink path provider is replaced with a recursive `fd`-backed provider. Typing `/tfl` searches descendants of the current working directory and lets Blink fuzzy-match paths such as `src/deep/target_file.lua`; accepted bare-root results use the valid relative form `./src/deep/target_file.lua`. Typing an explicit directory such as `src/deep/tfl` limits the search to that directory. The initial `/` still shows top-level entries.
+
+Pi prompt buffers keep their separate `@` path and `/skill` completion behavior; `@tfl` also searches descendants and inserts the accepted path with the `@` marker. File arguments to `:e` and `:vs` use the same fuzzy path source (for example, `:e tfl`).
 
 ## Customization
 

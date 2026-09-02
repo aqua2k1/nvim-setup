@@ -43,7 +43,7 @@ local M = {
             files = {
                 [1] = true, -- 继承默认 actions（enter/ctrl-s/ctrl-v/ctrl-t/alt-q 等）
                 -- <C-a>: 接收所有结果并发送到 quickfix
-                ["ctrl-a"] = {
+                ["ctrl-q"] = {
                     fn = function(selected, opts)
                         require('fzf-lua.actions').file_sel_to_qf(selected, opts)
                     end,

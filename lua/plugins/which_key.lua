@@ -14,6 +14,7 @@ local M = {
             { "<leader>t", mode = { "n", "x" }, group = "term" },
             { "<leader>o", mode = "n",          group = "task" },
             { "<leader>g", mode = { "n", "x" }, group = "git" },
+            { "<leader>w", proxy = "<c-w>", group = "windows" },
         }
     },
     keys = {
