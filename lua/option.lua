@@ -20,7 +20,7 @@ vim.o.linebreak = true
 
 -- Sync clipboard between the OS and Neovim.
 -- tmux: forward the clipboard via OSC 52 (also works over SSH).
--- WSL: pin xclip so provider detection does not walk the huge Windows PATH.
+-- WSL: use the Windows clipboard explicitly when win32yank is available.
 local is_wsl = vim.fn.has("wsl") == 1
   or (vim.uv.os_uname().release or ""):lower():find("microsoft", 1, true) ~= nil
 local is_ssh = vim.env.SSH_CONNECTION ~= nil or vim.env.SSH_TTY ~= nil
@@ -35,18 +35,35 @@ elseif is_ssh then
   -- 要求本地终端支持 OSC 52：iTerm2 / kitty / WezTerm / Windows Terminal 等均支持。
   vim.g.clipboard = "osc52"
 elseif is_wsl then
-  vim.g.clipboard = {
-    name = "xclip",
-    copy = {
-      ["+"] = { "xclip", "-quiet", "-i", "-selection", "clipboard" },
-      ["*"] = { "xclip", "-quiet", "-i", "-selection", "primary" },
-    },
-    paste = {
-      ["+"] = { "xclip", "-o", "-selection", "clipboard" },
-      ["*"] = { "xclip", "-o", "-selection", "primary" },
-    },
-    cache_enabled = 1,
-  }
+  if vim.fn.executable("win32yank.exe") == 1 then
+    -- xclip can own WSL's X11 selection without updating Windows' clipboard.
+    vim.g.clipboard = {
+      name = "win32yank-wsl",
+      copy = {
+        ["+"] = { "win32yank.exe", "-i", "--crlf" },
+        ["*"] = { "win32yank.exe", "-i", "--crlf" },
+      },
+      paste = {
+        ["+"] = { "win32yank.exe", "-o", "--lf" },
+        ["*"] = { "win32yank.exe", "-o", "--lf" },
+      },
+      cache_enabled = 0,
+    }
+  else
+    -- Fallback: this is WSL's X11 clipboard, not necessarily Windows' clipboard.
+    vim.g.clipboard = {
+      name = "xclip",
+      copy = {
+        ["+"] = { "xclip", "-quiet", "-i", "-selection", "clipboard" },
+        ["*"] = { "xclip", "-quiet", "-i", "-selection", "primary" },
+      },
+      paste = {
+        ["+"] = { "xclip", "-o", "-selection", "clipboard" },
+        ["*"] = { "xclip", "-o", "-selection", "primary" },
+      },
+      cache_enabled = 1,
+    }
+  end
 end
 -- else: 不设 g.clipboard，走 nvim 自动检测
 

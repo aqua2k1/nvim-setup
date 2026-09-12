@@ -210,7 +210,15 @@ Prompts for target language (en/zh). The model idle-unloads after 10 minutes.
 
 ### WSL
 
-Clipboard is automatically routed through `xclip`. Install it:
+Clipboard uses `win32yank.exe` when available, so yanks go to the Windows
+clipboard directly. Install it in Windows if needed:
+
+```powershell
+scoop install win32yank
+```
+
+If `win32yank.exe` is unavailable, the configuration falls back to `xclip`
+(which only guarantees WSL/X11 clipboard integration):
 
 ```bash
 sudo apt install xclip
