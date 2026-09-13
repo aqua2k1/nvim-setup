@@ -1,2 +1,6 @@
 __pycache__/
 *.py[cod]
+
+scripts/ime/*.exe
+scripts/ime/*.obj
+scripts/ime/*.pdb

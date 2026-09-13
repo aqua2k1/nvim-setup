@@ -15,6 +15,7 @@ Personal Neovim configuration focused on viewing code and files and editing prom
 
 - Python >= 3.10 + `curl` + `llama-server` in `PATH` + systemd (Linux) — built-in AI translation (`<leader>at` / `<leader>aT`)
 - [macism](https://github.com/laishulu/macism) — auto IME switch on macOS
+- MinGW-w64 or Visual Studio C++ — build the Windows/WSL IME helper (`scripts/ime/README.md`)
 
 ## Install
 
@@ -34,12 +35,12 @@ Treesitter core parsers install automatically.
 ├── lua/
 │   ├── option.lua            # Editor options
 │   ├── keymap.lua            # Global keymaps
-│   ├── autocmd.lua           # Autocommands
 │   ├── plugin.lua            # lazy.nvim bootstrap
 │   ├── statusline.lua        # Statusline
 │   ├── tabline.lua           # Tabline
 │   ├── plugins/              # Plugin specs (lazy.nvim)
 │   │   ├── cmp.lua           # blink.cmp
+│   │   ├── ime.lua           # IME plugin
 │   │   ├── file.lua          # oil.nvim
 │   │   ├── git.lua           # codediff.nvim
 │   │   ├── markdown.lua      # markview.nvim
@@ -51,11 +52,17 @@ Treesitter core parsers install automatically.
 │   │   ├── treesitter.lua    # nvim-treesitter
 │   │   └── which_key.lua     # which-key.nvim
 │   ├── user-plugins/
+│   │   ├── ime/              # IME plugin implementation
+│   │   │   ├── init.lua
+│   │   │   └── autocmd.lua
 │   │   └── translate/        # AI translation plugin
 │   └── utils/                # Shared color palette
 ├── colors/                   # Colorschemes
 ├── snippets/                 # Code snippets
 └── scripts/
+    ├── ime/                          # Windows/WSL IME helper
+    │   ├── ime.cpp
+    │   └── README.md
     ├── llama-translate.sh            # Translation model + service setup
     ├── llama-translate-service.py    # Idempotent systemd synchronizer
     └── systemd/                      # Canonical service template
@@ -223,6 +230,12 @@ If `win32yank.exe` is unavailable, the configuration falls back to `xclip`
 ```bash
 sudo apt install xclip
 ```
+
+Input method auto-switching uses the native helper in `scripts/ime/ime.exe`.
+Neovim starts it as a background server, so WSL's Windows-process startup cost
+is paid only once. On leaving Insert mode it switches the active IME to
+English; when entering Insert mode it restores the previous mode. Build
+instructions are in [`scripts/ime/README.md`](scripts/ime/README.md).
 
 ### macOS
 
